@@ -1,51 +1,95 @@
 ﻿@using TodoApp.Models;
 @page "/"
 
-<h1>Hello, world!</h1>
+    <div class="row">
+        <div class="col col-12">
+            <h1 class="text-center my-5">Welcome to the Amazing To Do App!</h1>
 
-@if(pq.Peek() == null)
-{
-    <h2>You have nothing to do today.</h2>        
-}
-else
-{
-    <h2>
-        Next you should @pq.Peek().Text
-    </h2>
-}
+            <div class="card text-center">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-7">
+                            <input type="text" name="todoText" @bind:event="oninput" @bind="todoText"  class="form-control" placeholder="New To Do" />
+                        </div>
+                        <div class="col-3">
+                            <select @bind="priority"  class="form-control">
+                                @foreach (var p in Enum.GetValues(typeof(Priority)))
+                                {
+                                    <option>@p</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            <button class="btn btn-primary btn-block" @onclick="addTodo" disabled="@(string.IsNullOrEmpty(todoText))">Add Todo</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (pq.Peek() == null)
+                    {
+                        <h5 class="card-title">You have nothing to do!</h5>
+                    }
+                    else
+                    {
+                        <h5 class="card-title">Next you should:</h5>
+                        <p class="card-text font-weight-bold">
+                            @pq.Peek().Text
+                        </p>
+                        <p>
+                            Priority: @pq.Peek().Priority.ToString()
+                        </p>
+                    }
 
-<input type="text" name="todoText" @bind="todoText" />
-<select @bind="priority">
-    @foreach (var p in Enum.GetValues(typeof(Priority)))
-    {
-        <option>@p</option>
-    }
-</select>
-<button class="btn btn-primary" @onclick="addTodo">Add Todo</button>
-<button class="btn btn-warning" @onclick="pq.Dequeue">Dequeue</button>
-<p>
-    @pq.Count
-</p>
-<ul>
-    @foreach(Todo todo in pq)
-    {
-        <li>
-            @todo.Text
-        </li>
-    }
-</ul>
+                    <button class="btn btn-success" @onclick="pq.Dequeue" disabled="@(pq.Peek()==null)">Completed</button>
+                </div>
+                <div class="card-footer text-muted">
+                    <p>
+                        You have @pq.Count things to do.
+                    </p>
+                    <button class="btn btn-secondary" @onclick="pq.Clear" disabled="@(pq.Peek()==null)">
+                        Clear All To Dos
+                    </button>
+                </div>
+            </div>
+            <ul class="list-group my-3 text-center">
+                @foreach (Todo todo in pq)
+                {
+                <li class="list-group-item list-group-item-@(priorityClass(todo.Priority))">
+                    <span class="font-weight-bold">
+                        @todo.Text
+                    </span>
+                </li>
+                }
+            </ul>
+
+        </div>
+    </div>
 
 @code {
 
     private static PriorityQueue pq = new PriorityQueue();
 
-    private string todoText;
+    private static string todoText;
     private Priority priority = Priority.Normal;
 
     private void addTodo()
     {
-        pq.Enqueue(new Todo($"{todoText} (priority: {priority.ToString()})", priority));
+        pq.Enqueue(new Todo(todoText, priority));
         priority = Priority.Normal;
         todoText = "";
+    }
+
+    private string priorityClass(Priority p)
+    {
+        if (p == Priority.Urgent)
+            return "danger";
+
+        if (p == Priority.High)
+            return "warning";
+
+        if (p == Priority.Low)
+            return "info";
+
+        return "light";
     }
 }

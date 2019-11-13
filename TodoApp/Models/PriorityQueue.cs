@@ -43,6 +43,11 @@ namespace TodoApp.Models
         {
             return First;
         }
+        
+        public void Clear()
+        {
+            First = null;
+        }
 
         public IEnumerator<Todo> GetEnumerator()
         {
