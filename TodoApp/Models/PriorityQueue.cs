@@ -34,9 +34,11 @@ namespace TodoApp.Models
             }
         }
 
-        public void Dequeue()
+        public Todo Dequeue()
         {
+            Todo beingDequeued = First;
             First = First.Next;
+            return beingDequeued;
         }
 
         public Todo Peek()
