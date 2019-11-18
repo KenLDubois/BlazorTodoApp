@@ -51,6 +51,20 @@ namespace TodoApp.Models
             First = null;
         }
 
+        public Todo this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= Count) return null;
+                Todo c = First;
+                for(int i = 0; i < index; i++)
+                {
+                    c = c.Next;
+                }
+                return c;
+            }
+        }
+
         public IEnumerator<Todo> GetEnumerator()
         {
             return new PriorityQueueEnumerator(this);
